@@ -10,13 +10,14 @@ def true_function(x):
     y = np.sin(np.pi * x * 0.8) * 10
     return y
 
-x = np.arange(-1,1,0.01)
-graph = true_function(x)
+fig, ax = plt.subplots()
+x = np.linspace(-1, 1, 100)
+y = true_function(x)
 
-plt.plot(graph)
-plt.title("ex1.1")
-plt.xlabel("x")
-plt.ylabel("y")
+ax.plot(x,y)
+ax.set_title("ex1.1")
+ax.set_xlabel("x")
+ax.set_ylabel("y")
 plt.legend("y = sin(π * x * 0.8) * 10")
 plt.show()
 plt.savefig("ex1.1.png")
