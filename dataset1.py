@@ -63,7 +63,7 @@ noizes_df = pd.DataFrame({"観測値": y})
 df = pd.concat([df, noizes_df], axis=1)
 #print(df)
 
-#描画
+""" #描画
 fig, ax = plt.subplots()
 x = np.linspace(-1, 1, 100)
 y = true_function(x)
@@ -83,4 +83,9 @@ plt.scatter(x,y)
 plt.scatter(x, noizes, label="noizes")
 plt.legend()
 plt.show()
-plt.savefig("ex1.3.png")
+plt.savefig("ex1.3.png") """
+
+"""
+演習1.4
+"""
+df.to_csv("./output.tsv", sep="\t", index=True)
