@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib #日本語対応
 import random
 import pandas as pd
+from pandas.io.parsers import read_csv
 
 """
 演習1.1
@@ -15,82 +16,71 @@ def true_function(x):
     y = np.sin(np.pi * x * 0.8) * 10
     return y
 
-""" #描画
-fig, ax = plt.subplots()
-x = np.linspace(-1, 1, 100)
-y = true_function(x)
-
-ax.plot(x,y)
-ax.set_title("ex1.1")
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-plt.legend("y = sin(π * x * 0.8) * 10")
-plt.show()
-plt.savefig("ex1.1.png") """
-
 """
 演習1.2
 """
-#先にex1.1の図を描画
-fig, ax = plt.subplots()
-x = np.linspace(-1, 1, 100)
-y = true_function(x)
-ax.plot(x,y)
-
-random.seed(20)
-x = [random.uniform(-1,1) for _ in range(20)] #-1<=x<=1の範囲の乱数を20個生成
-y = [true_function(i) for i in x]
-df = pd.DataFrame({"観測点": x, "真値": y})
-#print(df)
-
-""" ax.set_title("ex1.2")
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-plt.legend("y = sin(π * x * 0.8) * 10")
-plt.scatter(x,y)
-plt.show()
-plt.savefig("ex1.2.png") """
+def make_observe_points(mn, mx, seed=20):
+    random.seed(seed)
+    x = [random.uniform(mn,mx) for _ in range(20)]
+    y = [true_function(i) for i in x]
+    df = pd.DataFrame({"観測点": x, "真値": y})
+    return df
 
 """
 演習1.3
 """
-noizes = [np.random.normal(0, 2) for _ in range(20)] #平均0, 標準偏差2のノイズを生成
-#print(noizes)
-noizes = [i/2 for i in noizes]
-#print(noizes)
-y = [i+noizes[num] for num,i in enumerate(y)]
-noizes_df = pd.DataFrame({"観測値": y})
-df = pd.concat([df, noizes_df], axis=1)
-#print(df)
-
-""" #描画
-fig, ax = plt.subplots()
-x = np.linspace(-1, 1, 100)
-y = true_function(x)
-ax.plot(x,y, label="y = sin(π * x * 0.8) * 10")
-
-random.seed(20)
-x = [random.uniform(-1,1) for _ in range(20)] #-1<=x<=1の範囲の乱数を20個生成
-y = [true_function(i) for i in x]
-df = pd.DataFrame({"観測点": x, "真値": y})
-#print(df)
-
-ax.set_title("ex1.3")
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-#plt.legend("y = sin(π * x * 0.8) * 10")
-plt.scatter(x,y)
-plt.scatter(x, noizes, label="noizes")
-plt.legend()
-plt.show()
-plt.savefig("ex1.3.png") """
+def add_noizes(dataset, mean, ave):
+    noizes = [np.random.normal(mean, ave) for _ in range(20)]
+    noizes = [noize/2 for noize in noizes]
+    y = dataset["真値"] + noizes
+    dataset["観測値"] = y
+    return dataset
 
 """
 演習1.4
 """
-df.to_csv("./output.tsv", index=False)
+def output_tsv_file(dataset, output_tsv_name):
+    dataset.to_csv(output_tsv_name, sep="\t")
+
 """
 演習1.5
 """
-df = pd.read_csv("./output.tsv")
-print(df)
+def read_tsv_file(file_path):
+    df = pd.read_csv(file_path, sep="\t")
+    return df
+
+def draw_pictures(mn, mx):
+    x = np.linspace(mn, mx, 100)
+    y = true_function(x)
+    plt.figure()
+    plt.plot(x,y, label="y = sin(π * x * 0.8) * 10")
+    plt.title("ex1.1")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.grid(True)
+    plt.legend(loc="best")
+    plt.savefig("ex1.1.png")
+
+    dataset = make_observe_points(mn, mx)
+    dataset = add_noizes(dataset, 0, 2)
+    plt.title("ex1.2")
+    plt.scatter(dataset["観測点"].values, dataset["真値"].values, label="真値")
+    plt.legend(loc="best")
+    plt.savefig("ex1.2.png")
+
+    plt.title("ex1.3")
+    plt.scatter(dataset["観測点"].values, dataset["観測値"].values, label="観測値")
+    plt.legend(loc="best")
+    plt.savefig("ex1.3.png")
+
+if __name__ == "__main__":
+    mn = -1
+    mx = 1
+    dataset = make_observe_points(mn, mx)
+    dataset = add_noizes(dataset, 0, 2)
+
+    draw_pictures(mn, mx)
+
+    output_tsv_file(dataset, "output.tsv")
+    file = read_tsv_file("output.tsv")
+    print(file)
