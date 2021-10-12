@@ -88,4 +88,9 @@ plt.savefig("ex1.3.png") """
 """
 演習1.4
 """
-df.to_csv("./output.tsv", sep="\t", index=True)
+df.to_csv("./output.tsv", index=False)
+"""
+演習1.5
+"""
+df = pd.read_csv("./output.tsv")
+print(df)
